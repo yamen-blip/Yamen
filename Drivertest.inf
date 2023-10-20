@@ -1,0 +1,80 @@
+;
+; Drivertest.inf
+;
+
+[Version]
+Signature="$WINDOWS NT$"
+Class=System ; TODO: specify appropriate Class
+ClassGuid={4d36e97d-e325-11ce-bfc1-08002be10318} ; TODO: specify appropriate ClassGuid
+Provider=%ManufacturerName%
+CatalogFile=Drivertest.cat
+DriverVer = 10/20/2023,20.39.57.943
+PnpLockdown=1
+
+[DestinationDirs]
+DefaultDestDir = 12
+Drivertest_Device_CoInstaller_CopyFiles = 11
+
+[SourceDisksNames]
+1 = %DiskName%,,,""
+
+[SourceDisksFiles]
+Drivertest.sys  = 1,,
+;
+
+
+;*****************************************
+; Install Section
+;*****************************************
+
+[Manufacturer]
+%ManufacturerName%=Standard,NTamd64
+
+[Standard.NTamd64]
+%Drivertest.DeviceDesc%=Drivertest_Device, Root\Drivertest ; TODO: edit hw-id
+
+[Drivertest_Device.NT]
+CopyFiles=Drivers_Dir
+
+[Drivers_Dir]
+Drivertest.sys
+
+;-------------- Service installation
+[Drivertest_Device.NT.Services]
+AddService = Drivertest,%SPSVCINST_ASSOCSERVICE%, Drivertest_Service_Inst
+
+; -------------- Drivertest driver install sections
+[Drivertest_Service_Inst]
+DisplayName    = %Drivertest.SVCDESC%
+ServiceType    = 1               ; SERVICE_KERNEL_DRIVER
+StartType      = 3               ; SERVICE_DEMAND_START
+ErrorControl   = 1               ; SERVICE_ERROR_NORMAL
+ServiceBinary  = %12%\Drivertest.sys
+
+;
+;--- Drivertest_Device Coinstaller installation ------
+;
+
+[Drivertest_Device.NT.CoInstallers]
+AddReg=Drivertest_Device_CoInstaller_AddReg
+CopyFiles=Drivertest_Device_CoInstaller_CopyFiles
+
+[Drivertest_Device_CoInstaller_AddReg]
+;
+
+
+[Drivertest_Device_CoInstaller_CopyFiles]
+;
+
+
+[Drivertest_Device.NT.Wdf]
+KmdfService =  Drivertest, Drivertest_wdfsect
+[Drivertest_wdfsect]
+KmdfLibraryVersion = 1.15
+
+[Strings]
+SPSVCINST_ASSOCSERVICE= 0x00000002
+ManufacturerName="<Your manufacturer name>" ;TODO: Replace with your manufacturer name
+DiskName = "Drivertest Installation Disk"
+Drivertest.DeviceDesc = "Drivertest Device"
+Drivertest.SVCDESC = "Drivertest Service"
